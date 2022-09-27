@@ -1,4 +1,17 @@
+from xml.dom.minidom import Element
 from chess_game import ChessGame
+
+
+def white_turn(chess):
+    move = input("Move (WHITE): ")
+    while not chess.is_legal(move):
+        move = input("Try another move (WHITE): ")
+
+    chess.move(move)
+
+
+def black_turn(chess):  # bot
+    white_turn(chess)
 
 
 def main():
@@ -7,9 +20,11 @@ def main():
     is_running = True
     while is_running:
         chess.print_board()
-        move = input("Move: ")
-        while not chess.is_legal(move):
-            move = input("Try another move: ")
+
+        if chess.turn == chess.WHITE:
+            white_turn(chess)
+        else:
+            black_turn(chess)
 
 
 if __name__ == "__main__":

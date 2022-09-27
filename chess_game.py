@@ -3,9 +3,16 @@ import chess
 
 
 class ChessGame():
+    WHITE = True
+    BLACK = False
+
     def __init__(self) -> None:
         self.board = chess.Board()
         # self.board = chess.Board("3k4/8/8/8/8/8/8/3K4 b KQkq - 0 4")
+
+    @property
+    def turn(self):
+        return self.board.turn
 
     def is_draw(self):
         outcome = self.board.outcome()
@@ -18,7 +25,11 @@ class ChessGame():
         return self.board.is_checkmate()
 
     def is_legal(self, uci):
-        return uci in self.board.legal_moves
+        try:
+            m = chess.Move.from_uci(uci)
+            return m in self.board.legal_moves
+        except ValueError:
+            return False
 
     def move(self, uci):
         m = chess.Move.from_uci(uci)
