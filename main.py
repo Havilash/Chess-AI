@@ -11,7 +11,11 @@ def white_turn(chess):
 
 
 def black_turn(chess):  # bot
-    white_turn(chess)
+    move = input("Move (BLACK): ")
+    while not chess.is_legal(move):
+        move = input("Try another move (BLACK): ")
+
+    chess.move(move)
 
 
 def main():
