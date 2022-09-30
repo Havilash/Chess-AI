@@ -1,5 +1,6 @@
-from tkinter.messagebox import RETRY
 import chess
+
+PIECES_SCORE = {'p': 10, 'n': 30, 'b': 30, 'r': 50, 'q': 90, 'k': 900}
 
 
 class ChessGame():
@@ -8,7 +9,6 @@ class ChessGame():
 
     def __init__(self) -> None:
         self.board = chess.Board()
-        # self.board = chess.Board("3k4/8/8/8/8/8/8/3K4 b KQkq - 0 4")
 
     @property
     def turn(self):
@@ -38,5 +38,25 @@ class ChessGame():
     def print_board(self):
         print(self.board)
 
-    def evaluate_score(self, color):
-        self.board.pieces(color=chess.WHITE)
+    def pieces_score(self, color: chess.Color):
+        score = 0
+        for square in chess.SQUARES:
+            if self.board.color_at(square) == color:
+                piece = self.board.piece_at(square)
+                score += PIECES_SCORE[piece.symbol().lower()]
+
+        return score
+
+    def evaluate_score(self, color: chess.Color):
+        score = self.pieces_score(
+            color) - self.pieces_score(not color)
+
+        outcome = self.board.outcome()
+        if outcome is not None:
+            if hasattr(outcome, "winner"):
+                if outcome.winner == color:
+                    score += 900
+                else:
+                    score -= 900
+
+        return score

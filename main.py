@@ -2,10 +2,8 @@
 from chess_game import ChessGame
 import chess as chess_lib
 
-POINTS = {'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 15}
 
-
-def white_turn(chess):
+def white_turn(chess: ChessGame):
     move = input("Move (WHITE): ")
     while not chess.is_legal(move):
         move = input("Try another move (WHITE): ")
@@ -13,47 +11,31 @@ def white_turn(chess):
     chess.move(move)
 
 
-def minimax(chess: ChessGame, depth, is_maximizing):
-    if depth <= 0:
-        return 0 + caputre_score
-
-    if chess.is_checkmate():
-        if is_maximizing:
-            return 50 + caputre_score
-        else:
-            return -50 + caputre_score
-    if chess.is_draw():
-        return 0 + caputre_score
+def minimax(chess: ChessGame, depth, alpha, beta, is_maximizing):
+    if depth <= 0 or chess.board.is_game_over():
+        return chess.evaluate_score(chess.BLACK)
 
     if is_maximizing:
         best_score = float("-inf")
         for move in chess.board.legal_moves:
-            # capture = str(chess.board.piece_at(
-            #     chess_lib.parse_square(str(move)[-2:])))
-
-            # caputre_score += POINTS[capture.lower()
-            #                         ] if capture.lower() in POINTS.keys() else 0
-
             chess.board.push(move)
-            score = minimax(chess, depth-1, False)
+            score = minimax(chess, depth-1, alpha, beta, False)
             chess.board.pop()
-            if (score > best_score):
-                best_score = score
+            best_score = max(best_score, score)
+            alpha = max(alpha, score)
+            if beta <= alpha:
+                break
         return best_score
     else:
         best_score = float("inf")
         for move in chess.board.legal_moves:
-            # capture = str(chess.board.piece_at(
-            #     chess_lib.parse_square(str(move)[-2:])))
-
-            # caputre_score -= POINTS[capture.lower()
-            #                         ] if capture.lower() in POINTS.keys() else 0
-
             chess.board.push(move)
-            score = minimax(chess, depth-1, True)
+            score = minimax(chess, depth-1, alpha, beta, True)
             chess.board.pop()
-            if (score < best_score):
-                best_score = score
+            best_score = min(best_score, score)
+            beta = min(beta, best_score)
+            if beta <= alpha:
+                break
         return best_score
 
 
@@ -62,7 +44,7 @@ def black_turn(chess: ChessGame):  # bot
     best_move = None
     for move in chess.board.legal_moves:
         chess.board.push(move)
-        score = minimax(chess, 3, False)
+        score = minimax(chess, 3, float("-inf"), float("inf"), False)
         chess.board.pop()
         if (score > best_score):
             best_score = score
