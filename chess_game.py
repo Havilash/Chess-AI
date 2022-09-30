@@ -35,8 +35,8 @@ class ChessGame():
         m = chess.Move.from_uci(uci)
         self.board.push(m)
 
-    def revert_last_move(self):
-        self.board.pop()
-
     def print_board(self):
         print(self.board)
+
+    def evaluate_score(self, color):
+        self.board.pieces(color=chess.WHITE)
