@@ -1,12 +1,22 @@
 
+import chess_game
 from chess_game import ChessGame
 import chess as chess_lib
 
 
 def sorted_moves(chess: ChessGame):
     def sort_func(x):
-        piece = chess.board.piece_at(chess_lib.parse_square(str(x)[-2:]))
-        return True if piece else False
+        score_guess = 0
+        start_piece = chess.board.piece_at(
+            chess_lib.parse_square(str(x)[:2]))
+        capture_piece = chess.board.piece_at(
+            chess_lib.parse_square(str(x)[2:4]))
+
+        if capture_piece is not None:
+            score_guess = chess_game.PIECES_SCORE[capture_piece.symbol().lower()] - \
+                chess_game.PIECES_SCORE[start_piece.symbol().lower()]/10
+
+        return score_guess
 
     return sorted(list(chess.board.legal_moves), key=sort_func, reverse=True)
 
@@ -16,6 +26,7 @@ def minimax(chess: ChessGame, depth, alpha, beta, is_maximizing):
         return chess.eval_score_diff(chess.BLACK)
 
     moves = sorted_moves(chess)
+    moves = chess.board.legal_moves
 
     if is_maximizing:
         best_score = float("-inf")
@@ -42,7 +53,6 @@ def minimax(chess: ChessGame, depth, alpha, beta, is_maximizing):
 
 
 def white_turn(chess: ChessGame):
-    print()
     move = input("Move (WHITE): ")
     while not chess.is_legal(move):
         move = input("Try another move (WHITE): ")
@@ -55,7 +65,7 @@ def black_turn(chess: ChessGame):  # bot
     best_move = None
     for move in chess.board.legal_moves:
         chess.board.push(move)
-        score = minimax(chess, 3, float("-inf"), float("inf"), False)
+        score = minimax(chess, 4, float("-inf"), float("inf"), False)
         chess.board.pop()
         if (score > best_score):
             best_score = score
@@ -65,8 +75,7 @@ def black_turn(chess: ChessGame):  # bot
 
 
 def main():
-    chess = ChessGame(fen="rnbqkbnr/pppppppp/8/Q7/8/8/PPPPPPPP/RNB1KBNR")
-
+    chess = ChessGame()
     is_running = True
     while is_running:
         print()
